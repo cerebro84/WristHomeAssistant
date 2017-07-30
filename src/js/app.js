@@ -6,7 +6,7 @@
  */
 console.log('WY started!');
 
-var appVersion = '0.5.0';
+var appVersion = '0.5.1';
 var confVersion = '0.2.0';
 
 var UI = require('ui');
@@ -109,7 +109,7 @@ function getstates() {
                     //  
                 } else {
                     var name = data[i].attributes.friendly_name;
-                    if (name !== undefined && name.indexOf('yeelight') !== -1) {
+                    if (name !== undefined && data[i].entity_id.indexOf('light') !== -1) {
                         statusMenu.item(0, menuIndex, {
                             title: data[i].attributes.friendly_name,
                             subtitle: data[i].state + ' ' + humanDiff(now, new Date(data[i].last_changed))
@@ -191,6 +191,28 @@ statusMenu.on('select', function(e) {
     var service = device[0]; 
 
     if (service == "switch" || service == "light") {
+        var requestData = { "entity_id": thisDevice.entity_id };
+        console.log("Request Data: " + JSON.stringify(requestData));
+        ajax({
+                url: baseurl + '/services/' + service + '/' + "toggle",
+                method: 'post',
+                headers: baseheaders,
+                type: 'json',
+                data: requestData
+            },
+            function(data) {
+                // Success!
+                console.log(JSON.stringify(data));
+            },
+            function(error) {
+                // Failure!
+                console.log('no response');
+            }
+        );
+        return;
+      
+      
+      
         statusObjectMenu.item(1, 0, { //menuIndex
             title: 'turn_on'
         });
